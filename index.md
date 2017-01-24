@@ -1,37 +1,53 @@
-## Welcome to GitHub Pages
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-You can use the [editor on GitHub](https://github.com/sardel/Awesome-Fun-Game/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+public class SquareControllerScript : MonoBehaviour {
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+    public float maxSpeed = 10f;
+    bool facingRight = true;
 
-### Markdown
+    bool grounded = false;
+    public Transform groundCheck;
+    float groundRadius = 0.2f;
+    public LayerMask whatIsGround;
+    public float JumpForce = 700f;
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+    private Rigidbody2D rigidbody2D;
 
-```markdown
-Syntax highlighted code block
+	// Use this for initialization
+	void Start () {
+        rigidbody2D = GetComponent<Rigidbody2D>();
+	}
+	
+	// Update is called once per frame
+	void FixedUpdate () {
 
-# Header 1
-## Header 2
-### Header 3
+        grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
 
-- Bulleted
-- List
+        float move = Input.GetAxis ("Horizontal");
+        
+       rigidbody2D.velocity = new Vector2(move * maxSpeed, rigidbody2D.velocity.y);
 
-1. Numbered
-2. List
+        if (move > 0 && !facingRight)
+            Flip();
+        else if (move < 0 && facingRight)
+            Flip();
 
-**Bold** and _Italic_ and `Code` text
+	}
 
-[Link](url) and ![Image](src)
-```
+    void Update()
+    {
+        if(grounded && Input.GetKeyDown(KeyCode.Space))
+        {
+           rigidbody2D.AddForce(new Vector2(0, JumpForce));  
+    }
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/sardel/Awesome-Fun-Game/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+        void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 theScale = transform.localScale;
+        theScale.x *= -1;
+        transform.localScale = theScale;
+    }
+}
